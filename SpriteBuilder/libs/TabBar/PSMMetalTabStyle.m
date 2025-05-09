@@ -314,14 +314,14 @@
 	NSColor *lineColor = nil;
 	NSBezierPath *bezier = [NSBezierPath bezierPath];
     
-    if (YOSEMITE_UI)
-    {
+//    if (YOSEMITE_UI)
+//    {
         lineColor = [NSColor colorWithCalibratedWhite:0.5 alpha:1];
-    }
-    else
-    {
-        lineColor = [NSColor darkGrayColor];
-    }
+//    }
+//    else
+//    {
+//        lineColor = [NSColor darkGrayColor];
+//    }
 
 	//disable antialiasing of bezier paths
 	[NSGraphicsContext saveGraphicsState];
@@ -338,16 +338,16 @@
 			aRect.size.height -= 0.5;
 			//NSDrawWindowBackground(aRect);
             
-            if (YOSEMITE_UI)
-            {
-                if ([[[cell controlView] window] isMainWindow]) [[NSColor colorWithCalibratedWhite:0.79 alpha:1] set];
-                else [[NSColor colorWithCalibratedWhite:0.96 alpha:1] set];
-            }
-            else
-            {
-                if ([[[cell controlView] window] isMainWindow]) [[NSColor colorWithCalibratedWhite:0.63 alpha:1] set];
-                else [[NSColor colorWithCalibratedWhite:0.84 alpha:1] set];
-            }
+//            if (YOSEMITE_UI)
+//            {
+                if ([[[cell controlView] window] isMainWindow]) [[NSColor controlColor] set];
+                else [[NSColor selectedControlColor] set];
+//            }
+//            else
+//            {
+//                if ([[[cell controlView] window] isMainWindow]) [[NSColor colorWithCalibratedWhite:0.63 alpha:1] set];
+//                else [[NSColor colorWithCalibratedWhite:0.84 alpha:1] set];
+//            }
             
             NSRectFill(aRect);
 			aRect.size.width++;
@@ -548,27 +548,27 @@
 	[[NSGraphicsContext currentContext] setShouldAntialias:NO];
 
 	//[[NSColor colorWithCalibratedWhite:0.0 alpha:0.2] set];
-    if (YOSEMITE_UI)
-    {
+//    if (YOSEMITE_UI)
+//    {
         if (inFocus) [[NSColor colorWithCalibratedWhite:0.7 alpha:1.0] set];
         else [[NSColor colorWithCalibratedWhite:0.85 alpha:1.0] set];
-    }
-    else
-    {
-        if (inFocus) [[NSColor colorWithCalibratedWhite:0.5 alpha:1.0] set];
-        else [[NSColor colorWithCalibratedWhite:0.7 alpha:1.0] set];
-    }
+//    }
+//    else
+//    {
+//        if (inFocus) [[NSColor colorWithCalibratedWhite:0.5 alpha:1.0] set];
+//        else [[NSColor colorWithCalibratedWhite:0.7 alpha:1.0] set];
+//    }
     
 	NSRectFillUsingOperation(rect, NSCompositeSourceAtop);
     
-    if (YOSEMITE_UI)
-    {
+//    if (YOSEMITE_UI)
+//    {
         [[NSColor colorWithCalibratedWhite:0.5 alpha:1] set];
-    }
-    else
-    {
-        [[NSColor darkGrayColor] set];
-    }
+//    }
+//    else
+//    {
+//        [[NSColor darkGrayColor] set];
+//    }
     
 
 	if(orientation == PSMTabBarHorizontalOrientation) {

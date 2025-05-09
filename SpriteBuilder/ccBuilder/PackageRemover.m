@@ -22,12 +22,12 @@
 {
     PackagePathBlock block = ^BOOL(NSString *packagePath, NSError **localError)
     {
-        if ([_projectSettings removeResourcePath:packagePath error:localError])
+        if ([self->_projectSettings removeResourcePath:packagePath error:localError])
         {
             [[NSNotificationCenter defaultCenter] postNotificationName:RESOURCE_REMOVED object:@{@"filepath": packagePath}];
             [[NSNotificationCenter defaultCenter] postNotificationName:RESOURCE_PATHS_CHANGED object:nil];
 
-            return [_fileManager removeItemAtPath:packagePath error:localError];
+            return [self->_fileManager removeItemAtPath:packagePath error:localError];
         }
 
         return NO;

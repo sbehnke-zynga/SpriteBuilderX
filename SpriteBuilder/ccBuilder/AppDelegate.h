@@ -311,6 +311,7 @@ typedef void (^CompletionCallback) (BOOL success);
     
 }
 
+void runOnMainQueueWithoutDeadlocking(void (^block)(void));
 
 @property (weak) IBOutlet MainWindow *window;
 

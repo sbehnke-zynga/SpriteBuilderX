@@ -639,8 +639,8 @@ static NSString * kZeroContentSizeImage = @"sel-round.png";
                     
                     NodeInfo* nodeInfo = node.userObject;
                     if (nodeInfo) {
-                        NSDictionary* propInfo = [nodeInfo.plugIn.nodePropertiesDict objectForKey:@"contentSize"];
-                        BOOL disabledContentSize = CGSizeEqualToSize(transformSizeNode.contentSizeInPoints, CGSizeZero);
+//                        NSDictionary* propInfo = [nodeInfo.plugIn.nodePropertiesDict objectForKey:@"contentSize"];
+//                        BOOL disabledContentSize = CGSizeEqualToSize(transformSizeNode.contentSizeInPoints, CGSizeZero);
                         
                         lSprt.position = points[4];
                         rSprt.position = points[6];
@@ -1251,7 +1251,7 @@ static NSString * kZeroContentSizeImage = @"sel-round.png";
     [self nodesUnderPt:pos rootNode:rootNode nodes:nodesAtSelectionPt];
     
     [[jointsLayer.children.firstObject children] forEach:^(CCNode * jointNode, int idx) {
-        [self nodesUnderPt:pos rootNode:jointNode nodes:nodesAtSelectionPt];
+        [self nodesUnderPt:pos rootNode:jointNode nodes:self->nodesAtSelectionPt];
     }];
     
     currentNodeAtSelectionPtIdx = (int)[nodesAtSelectionPt count] -1;
@@ -1423,7 +1423,7 @@ static NSString * kZeroContentSizeImage = @"sel-round.png";
 	[self nodesUnderPt:pos rootNode:rootNode nodes:nodesAtSelectionPt];
 	
 	[[jointsLayer.children.firstObject children] forEach:^(CCNode * jointNode, int idx) {
-        [self nodesUnderPt:pos rootNode:jointNode nodes:nodesAtSelectionPt];
+        [self nodesUnderPt:pos rootNode:jointNode nodes:self->nodesAtSelectionPt];
     }];
 
     currentNodeAtSelectionPtIdx = (int)[nodesAtSelectionPt count] -1;

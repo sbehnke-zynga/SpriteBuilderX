@@ -210,7 +210,7 @@
             if (![joint[@"properties"] findFirst:find])
             {
                 NSString *description = [NSString stringWithFormat:@"Joint %@ must have bodyA attached. Not exporting it.", joint[@"displayName"]];
-                [_warnings addWarningWithDescription:description isFatal:NO relatedFile:_currentWorkingFile];
+                [self->_warnings addWarningWithDescription:description isFatal:NO relatedFile:self->_currentWorkingFile];
                 return NO;
             }
 
@@ -219,7 +219,7 @@
             if (![joint[@"properties"] findFirst:find])
             {
                 NSString *description = [NSString stringWithFormat:@"Joint %@ must have a bodyB attached. Not exporting it.", joint[@"displayName"]];
-                [_warnings addWarningWithDescription:description isFatal:NO relatedFile:_currentWorkingFile];
+                [self->_warnings addWarningWithDescription:description isFatal:NO relatedFile:self->_currentWorkingFile];
                 return NO;
             }
 

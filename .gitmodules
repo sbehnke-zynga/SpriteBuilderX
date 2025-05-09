@@ -1,4 +1,4 @@
 [submodule "SpriteBuilder/libs/cocos2d-iphone"]
 	path = SpriteBuilder/libs/cocos2d-iphone
-url=https://github.com/newnon/cocos2d-iphone.git
+	url = https://github.com/sbehnke-zynga/cocos2d-iphone.git
 

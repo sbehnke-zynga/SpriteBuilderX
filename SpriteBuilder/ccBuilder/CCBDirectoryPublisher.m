@@ -215,7 +215,7 @@
             BOOL createdDirs = [fileManager createDirectoryAtPath:outDir withIntermediateDirectories:YES attributes:NULL error:NULL];
             if (!createdDirs)
             {
-                [_warnings addWarningWithDescription:@"Failed to create output directory \"%@\"" isFatal:YES];
+                [self->_warnings addWarningWithDescription:@"Failed to create output directory \"%@\"" isFatal:YES];
             }
         }];
 	}
@@ -483,7 +483,7 @@
     [_queue addOperationWithBlock:^
     {
         NSFileManager *fileManager = [NSFileManager defaultManager];
-        [fileManager removeItemAtPath:[_projectSettings tempSpriteSheetCacheDirectory] error:NULL];
+        [fileManager removeItemAtPath:[self->_projectSettings tempSpriteSheetCacheDirectory] error:NULL];
     }];
 
     NSDate *srcSpriteSheetDate = [publishDirectory latestModifiedDateOfPathIgnoringDirs:YES];
@@ -533,7 +533,7 @@
          {
              if (![publishIntermediateFilesLookup writeToFile:intermediateFileLookupPath])
              {
-                 [_warnings addWarningWithDescription:[NSString stringWithFormat:@"Could not write intermediate file lookup for smart spritesheet %@ @ universal", spriteSheetName]];
+                 [self->_warnings addWarningWithDescription:[NSString stringWithFormat:@"Could not write intermediate file lookup for smart spritesheet %@ @ universal", spriteSheetName]];
              }
              [CCBFileUtil setModificationDate:srcSpriteSheetDate forFile:intermediateFileLookupPath];
          }];
@@ -579,7 +579,7 @@
          {
              if (![publishIntermediateFilesLookup writeToFile:intermediateFileLookupPath])
              {
-                 [_warnings addWarningWithDescription:[NSString stringWithFormat:@"Could not write intermediate file lookup for smart spritesheet %@ @ universal", spriteSheetName]];
+                 [self->_warnings addWarningWithDescription:[NSString stringWithFormat:@"Could not write intermediate file lookup for smart spritesheet %@ @ universal", spriteSheetName]];
              }
              [CCBFileUtil setModificationDate:srcSpriteSheetDate forFile:intermediateFileLookupPath];
          }];
@@ -620,7 +620,7 @@
         {
             if (![publishIntermediateFilesLookup writeToFile:intermediateFileLookupPath])
             {
-                [_warnings addWarningWithDescription:[NSString stringWithFormat:@"Could not write intermediate file lookup for smart spritesheet %@ @ %@", spriteSheetName, resolution]];
+                [self->_warnings addWarningWithDescription:[NSString stringWithFormat:@"Could not write intermediate file lookup for smart spritesheet %@ @ %@", spriteSheetName, resolution]];
             }
             [CCBFileUtil setModificationDate:srcSpriteSheetDate forFile:intermediateFileLookupPath];
         }];

@@ -10,7 +10,7 @@
 #import "SMTabBarItem.h"
 #import "SMTabBarButtonCell.h"
 #import "NSDictionary+SMKeyValueObserving.h"
-
+#import "AppDelegate.h"
 
 #define SMTabBarButtonWidth 32.0f
 
@@ -61,7 +61,9 @@ static char SMObservationContext;
 
 -(void)selectBarButtonIndex:(NSInteger)index
 {
-    [self selectBarButton:self.barButtons[index]];
+    runOnMainQueueWithoutDeadlocking(^{
+        [self selectBarButton:self.barButtons[index]];
+    });
 }
 
 - (void)selectBarButton:(id)sender {

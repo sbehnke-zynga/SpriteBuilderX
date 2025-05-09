@@ -172,7 +172,7 @@
 }
 
 - (BOOL)closeButtonOver {
-	return(_closeButtonOver && ([_ctrlView allowsBackgroundTabClosing] || ([self tabState] & PSMTab_SelectedMask) || [[NSApp currentEvent] modifierFlags] & NSCommandKeyMask));
+	return(_closeButtonOver && ([_ctrlView allowsBackgroundTabClosing] || ([self tabState] & PSMTab_SelectedMask) || [[NSApp currentEvent] modifierFlags] & NSEventModifierFlagCommand));
 }
 
 - (void)setCloseButtonOver:(BOOL)value {
@@ -324,7 +324,7 @@
 
 	// scrubtastic
 	if([_ctrlView allowsScrubbing] && ([theEvent modifierFlags] & NSAlternateKeyMask)) {
-		SUPPRESS_UNDECLARED_SELECTOR([_ctrlView performSelector:@selector(tabClick:) withObject:self]);
+		[_ctrlView performSelector:@selector(tabClick:) withObject:self];
 	}
 
 	// tell the control we only need to redraw the affected tab
@@ -354,7 +354,9 @@
 	//NSRect cellFrame = [self frame];
 
 	[_ctrlView lockFocus];
-	NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:cellFrame];
+	//NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:cellFrame];
+    NSBitmapImageRep *rep = [_ctrlView bitmapImageRepForCachingDisplayInRect:cellFrame];
+    [_ctrlView cacheDisplayInRect:cellFrame toBitmapImageRep:rep];
 	[_ctrlView unlockFocus];
 	NSImage *image = [[NSImage alloc] initWithSize:[rep size]];
 	[image addRepresentation:rep];
@@ -427,6 +429,9 @@
 #pragma mark -
 #pragma mark Accessibility
 
+/*
+ // ZYNGA: TODO Resolve deprecated methods.
+ 
 -(BOOL)accessibilityIsIgnored {
 	return NO;
 }
@@ -472,6 +477,7 @@
 		SUPPRESS_UNDECLARED_SELECTOR([_ctrlView performSelector:@selector(tabClick:) withObject:self]);
 	}
 }
+*/
 
 - (id)accessibilityHitTest:(NSPoint)point {
 	return NSAccessibilityUnignoredAncestor(self);

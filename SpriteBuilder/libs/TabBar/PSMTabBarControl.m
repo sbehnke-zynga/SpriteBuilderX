@@ -1079,7 +1079,11 @@
 	BOOL mouseInCell = NSMouseInRect(mousePoint, cellTrackingRect, [self isFlipped]);
 
 	//set the cell tracking rect
-	[self removeTrackingRect:[cell cellTrackingTag]];
+    NSTrackingRectTag trackingTag = [cell cellTrackingTag];
+    if (trackingTag != 0)
+    {
+        [self removeTrackingRect:trackingTag];
+    }
 	tag = [self addTrackingRect:cellTrackingRect owner:cell userData:nil assumeInside:mouseInCell];
 	[cell setCellTrackingTag:tag];
 	[cell setHighlighted:mouseInCell];
@@ -1089,7 +1093,11 @@
 		BOOL mouseInCloseRect = NSMouseInRect(mousePoint, closeRect, [self isFlipped]);
 
 		//set the close button tracking rect
-		[self removeTrackingRect:[cell closeButtonTrackingTag]];
+        NSTrackingRectTag trackingTag = [cell closeButtonTrackingTag];
+        if (trackingTag != 0)
+        {
+            [self removeTrackingRect:trackingTag];
+        }
 		tag = [self addTrackingRect:closeRect owner:cell userData:nil assumeInside:mouseInCloseRect];
 		[cell setCloseButtonTrackingTag:tag];
 
@@ -1171,7 +1179,7 @@
 		if(overClose &&
 		   ![self disableTabClose] &&
 		   ![cell isCloseButtonSuppressed] &&
-		   ([self allowsBackgroundTabClosing] || [[cell representedObject] isEqualTo:[tabView selectedTabViewItem]] || [theEvent modifierFlags] & NSCommandKeyMask)) {
+		   ([self allowsBackgroundTabClosing] || [[cell representedObject] isEqualTo:[tabView selectedTabViewItem]] || [theEvent modifierFlags] & NSEventModifierFlagCommand)) {
 			[cell setCloseButtonOver:NO];
 			[cell setCloseButtonPressed:YES];
 			_closeClicked = YES;
@@ -1308,6 +1316,8 @@
 	return YES;
 }
 
+// ZYGNA: TODO These are deprecated
+/*
 // NSDraggingSource
 - (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)isLocal {
 	return(isLocal ? NSDragOperationMove : NSDragOperationNone);
@@ -1324,6 +1334,7 @@
 - (void)draggedImage:(NSImage *)image movedTo:(NSPoint)screenPoint {
 	[[PSMTabDragAssistant sharedDragAssistant] draggingMovedTo:screenPoint];
 }
+*/
 
 // NSDraggingDestination
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender {
@@ -1416,9 +1427,12 @@
 	return YES;
 }
 
+/*
+ // ZYNGA: TODO Fix the depreceated method implementations
 - (void)draggedImage:(NSImage *)anImage endedAt:(NSPoint)aPoint operation:(NSDragOperation)operation {
 	[[PSMTabDragAssistant sharedDragAssistant] draggedImageEndedAt:aPoint operation:operation];
 }
+*/
 
 - (void)concludeDragOperation:(id <NSDraggingInfo>)sender {
 }
@@ -1872,6 +1886,8 @@
 #pragma mark -
 #pragma mark Accessibility
 
+/*
+ // ZYNGA: TODO Fix the deprecations
 -(BOOL)accessibilityIsIgnored {
 	return NO;
 }
@@ -1887,6 +1903,8 @@
 	}
 	return attributeValue;
 }
+ 
+*/
 
 - (id)accessibilityHitTest:(NSPoint)point {
 	id hitTestResult = self;

@@ -160,7 +160,7 @@
 
     [_publishingQueue addOperationWithBlock:^
     {
-        [_projectSettings clearAllDirtyMarkers];
+        [self->_projectSettings clearAllDirtyMarkers];
 
         [weakSelf resetNeedRepublish];
     }];

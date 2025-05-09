@@ -24,7 +24,7 @@
 
 #import "cocos2d.h"
 
-NSString * kAnimationOfPhysicsWarning;
+extern NSString * kAnimationOfPhysicsWarning;
 
 @class PlugInNode;
 @class SequencerNodeProperty;

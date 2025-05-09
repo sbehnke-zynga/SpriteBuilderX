@@ -76,24 +76,24 @@
 {
     return ^BOOL(NSString *packagePathToImport, NSError **localError)
     {
-        if ([_projectSettings isResourcePathInProject:packagePathToImport])
+        if ([self->_projectSettings isResourcePathInProject:packagePathToImport])
         {
             [NSError setNewErrorWithCode:localError code:SBPackageAlreayInProject message:@"Package already in project folder."];
             return NO;
         }
 
         NSString *packageName = [[packagePathToImport lastPathComponent] stringByDeletingPathExtension];
-        NSString *newPathInPackagesFolder = [_projectSettings fullPathForPackageName:packageName];
+        NSString *newPathInPackagesFolder = [self->_projectSettings fullPathForPackageName:packageName];
 
-        if (![_projectSettings isPathInPackagesFolder:packagePathToImport])
+        if (![self->_projectSettings isPathInPackagesFolder:packagePathToImport])
         {
-            if (![_fileManager copyItemAtPath:packagePathToImport toPath:newPathInPackagesFolder error:localError])
+            if (![self->_fileManager copyItemAtPath:packagePathToImport toPath:newPathInPackagesFolder error:localError])
             {
                 return NO;
             }
         }
 
-        if ([_projectSettings addResourcePath:newPathInPackagesFolder error:localError])
+        if ([self->_projectSettings addResourcePath:newPathInPackagesFolder error:localError])
         {
             [[NSNotificationCenter defaultCenter] postNotificationName:RESOURCE_PATHS_CHANGED object:nil];
             return YES;

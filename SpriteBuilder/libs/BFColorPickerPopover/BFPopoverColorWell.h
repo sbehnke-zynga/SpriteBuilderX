@@ -31,8 +31,9 @@
 #import <Cocoa/Cocoa.h>
 
 @interface BFPopoverColorWell : NSColorWell <NSPopoverDelegate>
++ (void)deactivateAll;
 
 @property (nonatomic) NSRectEdge preferredEdgeForPopover;
 @property (nonatomic) BOOL useColorPanelIfAvailable;
-
+@property (nonatomic) BOOL showAlpha;
 @end

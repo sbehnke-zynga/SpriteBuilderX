@@ -249,13 +249,9 @@
     //Undocumented function that resets the KeyViewLoop.
     if ([_currentView respondsToSelector:privateSelector])
     {
-        objc_msgSend(_currentView, privateSelector);
-    }
-
-    //Undocumented function that resets the KeyViewLoop.
-    if ([_currentView respondsToSelector:privateSelector])
-    {
-        objc_msgSend(_currentView, privateSelector);
+        IMP imp = [_currentView methodForSelector:privateSelector];
+        void (*func)(id, SEL) = (void *)imp;
+        func(_currentView, privateSelector);
     }
 }
 

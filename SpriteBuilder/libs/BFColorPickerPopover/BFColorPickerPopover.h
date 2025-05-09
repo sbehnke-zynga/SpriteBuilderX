@@ -33,9 +33,6 @@
 #define kBFColorPickerPopoverMinimumDragDistance 50.0f
 
 @interface BFColorPickerPopover : NSPopover
-{
-    BOOL addedObserver;
-}
 
 @property (nonatomic) id target;
 @property (nonatomic) SEL action;

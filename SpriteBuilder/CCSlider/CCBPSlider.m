@@ -65,7 +65,7 @@
 
 - (void) stateChanged
 {
-    CCSpriteFrame *frame = [_handleSpriteFrames objectForKey:[NSNumber numberWithInt:_state]];
+    CCSpriteFrame *frame = [_handleSpriteFrames objectForKey:[NSNumber numberWithInt:(int)_state]];
     if(frame)
         [_handle setSpriteFrame:frame];
     else
@@ -126,15 +126,15 @@
 - (void) setHandleSpriteFrame:(CCSpriteFrame*)spriteFrame forState:(CCBPControlState)state
 {
     if (spriteFrame)
-        [_handleSpriteFrames setObject:spriteFrame forKey:[NSNumber numberWithInt:state]];
+        [_handleSpriteFrames setObject:spriteFrame forKey:[NSNumber numberWithInt:(int)state]];
     else
-        [_handleSpriteFrames removeObjectForKey:[NSNumber numberWithInt:state]];
+        [_handleSpriteFrames removeObjectForKey:[NSNumber numberWithInt:(int)state]];
     [self stateChanged];
 }
 
 - (CCSpriteFrame*) handleSpriteFrameForState:(CCBPControlState)state
 {
-    return [_handleSpriteFrames objectForKey:[NSNumber numberWithInt:state]];
+    return [_handleSpriteFrames objectForKey:[NSNumber numberWithInt:(int)state]];
 }
 
 - (void) setState:(CCBPControlState)state

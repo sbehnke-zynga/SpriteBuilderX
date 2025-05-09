@@ -46,13 +46,13 @@
 - (IBAction)pressedStart:(id)sender
 {
     SEL selector = NSSelectorFromString(startMethod);
-    objc_msgSend(selection, selector);
+    ((id (*)(id, SEL))objc_msgSend)(selection, selector);
 }
 
 - (IBAction)pressedStop:(id)sender
 {
     SEL selector = NSSelectorFromString(stopMethod);
-    objc_msgSend(selection, selector);
+    ((id (*)(id, SEL))objc_msgSend)(selection, selector);
 }
 
 @end

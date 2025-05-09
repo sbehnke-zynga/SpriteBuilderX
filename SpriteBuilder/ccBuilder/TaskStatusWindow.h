@@ -25,7 +25,7 @@
 #import <Cocoa/Cocoa.h>
 #import "TaskStatusUpdaterProtocol.h"
 
-typedef void (^OnCancelBlock)();
+typedef void (^OnCancelBlock)(void);
 
 @interface TaskStatusWindow : NSWindowController <TaskStatusUpdaterProtocol>
 {

@@ -7,8 +7,7 @@
 //
 
 #import "FCFormatConverter.h"
-#import "PVRTexture.h"
-#import "PVRTextureUtilities.h"
+#include "PVRTexLib.hpp"
 #include "TextureConverter.h"
 
 static FCFormatConverter* gDefaultConverter = NULL;
@@ -236,7 +235,7 @@ static BOOL saveRawDataToPng(void* data, int width, int height, BOOL hasAlpha, B
 {
     int sourceBytes = hasAlpha?4:3;
     CGColorSpaceRef colorSpaceRef = CGColorSpaceCreateDeviceRGB();
-    CGBitmapInfo bitmapInfo = kCGBitmapByteOrder32Big|((hasAlpha&&alpha)?kCGImageAlphaLast:kCGImageAlphaNone);
+    CGBitmapInfo bitmapInfo = kCGBitmapByteOrder32Big|(CGBitmapInfo)((hasAlpha&&alpha)?kCGImageAlphaLast:kCGImageAlphaNone);
     CGColorRenderingIntent renderingIntent = kCGRenderingIntentDefault;
     
     CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, data, width*height*sourceBytes, NULL);
@@ -291,10 +290,11 @@ static BOOL convertToPng(NSString *srcPath, NSString *dstPath, kFCAlphaProcessin
     NSBitmapImageRep* rawImg = [NSBitmapImageRep imageRepWithData:[image TIFFRepresentation]];
     if(alphaProcessing == kFCAlphaProcessingPremultiply && [rawImg hasAlpha])
     {
-        pvrtexture::CPVRTextureHeader header(pvrtexture::PVRStandard8PixelType.PixelTypeID, rawImg.pixelsHigh, rawImg.pixelsWide);
-        pvrtexture::CPVRTexture     * pvrTexture = new pvrtexture::CPVRTexture(header, rawImg.bitmapData);
+        auto RGBA8888 = PVRTGENPIXELID4('r', 'g', 'b', 'a', 8, 8, 8, 8);
+        pvrtexlib::PVRTextureHeader header(RGBA8888, image.size.width, image.size.height);
+        pvrtexlib::PVRTexture     * pvrTexture = new pvrtexlib::PVRTexture(header, rawImg.bitmapData);
         
-        if(!pvrtexture::PreMultiplyAlpha(*pvrTexture))
+        if(!pvrTexture->GetTextureIsPreMultiplied())
         {
             if (error)
             {
@@ -305,7 +305,7 @@ static BOOL convertToPng(NSString *srcPath, NSString *dstPath, kFCAlphaProcessin
             delete pvrTexture;
             return NO;
         }
-        BOOL ret = saveRawDataToPng(pvrTexture->getDataPtr(), rawImg.pixelsWide, rawImg.pixelsHigh, [rawImg hasAlpha], YES, dstPath, error);
+        BOOL ret = saveRawDataToPng(pvrTexture->GetTextureDataPointer(), rawImg.pixelsWide, rawImg.pixelsHigh, [rawImg hasAlpha], YES, dstPath, error);
         delete pvrTexture;
         return ret;
     }
@@ -415,57 +415,55 @@ static void replacebytes(const char* path, long offset, const char * newBytes, l
     {
         // PVR(TC) image
         NSString *dstPath = [[srcPath stringByDeletingPathExtension] stringByAppendingPathExtension:@"pvr"];
-        
-        pvrtexture::PixelType pixelType;
-        EPVRTVariableType variableType = ePVRTVarTypeUnsignedByteNorm;
+
+        PVRTuint64 pixelType;
+        PVRTexLibVariableType variableType = PVRTLVT_UnsignedByteNorm;
         
         if (format == kFCImageFormatPVR_RGBA8888)
         {
-            pixelType = pvrtexture::PixelType('r','g','b','a',8,8,8,8);
+            pixelType = PVRTGENPIXELID4('r', 'g', 'b', 'a', 8, 8, 8, 8);
         }
         else if (format == kFCImageFormatPVR_RGBA4444)
         {
-            pixelType = pvrtexture::PixelType('r','g','b','a',4,4,4,4);
-            variableType = ePVRTVarTypeUnsignedShortNorm;
+            pixelType = PVRTGENPIXELID4('r', 'g', 'b', 'a', 4, 4, 4, 4);
+            variableType = PVRTLVT_UnsignedShortNorm;
         }
         else if (format == kFCImageFormatPVR_RGB888)
         {
-            pixelType = pvrtexture::PixelType('r','g','b',0,8,8,8,0);
+            pixelType = PVRTGENPIXELID4('r', 'g', 'b', 0, 8, 8, 8, 0);
         }
         else if (format == kFCImageFormatPVR_RGB565)
         {
-            pixelType = pvrtexture::PixelType('r','g','b',0,5,6,5,0);
-            variableType = ePVRTVarTypeUnsignedShortNorm;
+            pixelType = PVRTGENPIXELID4('r', 'g', 'b', 0, 8, 5, 6, 0);
+            variableType = PVRTLVT_UnsignedShortNorm;
         }
         else if (format == kFCImageFormatPVRTC_4BPP)
         {
-            pixelType = pvrtexture::PixelType(ePVRTPF_PVRTCI_4bpp_RGBA);
+            pixelType = PVRTLPF_PVRTCI_4bpp_RGBA;
         }
         else if (format == kFCImageFormatPVRTC_2BPP)
         {
-            pixelType = pvrtexture::PixelType(ePVRTPF_PVRTCI_2bpp_RGBA);
+            pixelType = PVRTLPF_PVRTCI_2bpp_RGBA;
         }
         else if (format == kFCImageFormatPVRTC2_4BPP)
         {
-            pixelType = pvrtexture::PixelType(ePVRTPF_PVRTCII_4bpp);
+            pixelType = PVRTLPF_PVRTCII_4bpp;
         }
         else if (format == kFCImageFormatPVRTC2_2BPP)
         {
-            pixelType = pvrtexture::PixelType(ePVRTPF_PVRTCII_2bpp);
+            pixelType = PVRTLPF_PVRTCII_2bpp;
         }
 
         NSImage * image = [[NSImage alloc] initWithContentsOfFile:srcPath];
         NSBitmapImageRep* rawImg = [NSBitmapImageRep imageRepWithData:[image TIFFRepresentation]];
         
-        pvrtexture::CPVRTextureHeader header(pvrtexture::PVRStandard8PixelType.PixelTypeID, image.size.height , image.size.width);
-        pvrtexture::CPVRTexture     * pvrTexture = new pvrtexture::CPVRTexture(header , rawImg.bitmapData);
-        
-        
+        auto RGBA8888 = PVRTGENPIXELID4('r', 'g', 'b', 'a', 8, 8, 8, 8);
+        pvrtexlib::PVRTextureHeader header(RGBA8888, image.size.width, image.size.height);
+        pvrtexlib::PVRTexture     * pvrTexture = new pvrtexlib::PVRTexture(header, rawImg.bitmapData);
         
         bool hasError = NO;
       
-        
-        if(!pvrtexture::PreMultiplyAlpha(*pvrTexture))
+        if(!pvrTexture->GetTextureIsPreMultiplied())
         {
             if (error)
 			{
@@ -476,7 +474,7 @@ static void replacebytes(const char* path, long offset, const char * newBytes, l
             hasError = YES;
         }
        
-        if(!hasError && !Transcode(*pvrTexture, pixelType, variableType, ePVRTCSpacelRGB, isRelease?pvrtexture::ePVRTCBest:pvrtexture::ePVRTCFast, dither))
+        if(!hasError && !pvrTexture->Transcode(pixelType, variableType, PVRTLCS_sRGB, isRelease?PVRTexLibCompressorQuality::PVRTLCQ_PVRTCBest:PVRTexLibCompressorQuality::PVRTLCQ_PVRTCFast, dither))
         {
             if (error)
             {
@@ -489,9 +487,10 @@ static void replacebytes(const char* path, long offset, const char * newBytes, l
         
         if(!hasError)
         {
-            CPVRTString filePath([dstPath UTF8String], dstPath.length);
             
-            if(!pvrTexture->saveFile(filePath))
+            std::string filePath([dstPath UTF8String], dstPath.length);
+            
+            if(!pvrTexture->SaveToFile(filePath))
             {
 				if (error)
 				{
@@ -592,7 +591,6 @@ static void replacebytes(const char* path, long offset, const char * newBytes, l
         
         *outputFilename = [dstPath copy];
         return YES;
-        
     }
     
     else if (format == kFCImageFormatDXT1 ||
@@ -703,6 +701,7 @@ static void replacebytes(const char* path, long offset, const char * newBytes, l
         }
 
         NSMutableData *data = nil;
+        (void)data;
         
         if(format == kFCImageFormatATC_EXPLICIT_ALPHA ||
            format == kFCImageFormatATC_INTERPOLATED_ALPHA ||
@@ -713,10 +712,11 @@ static void replacebytes(const char* path, long offset, const char * newBytes, l
             NSImage * image = [[NSImage alloc] initWithContentsOfFile:srcPath];
             NSBitmapImageRep* rawImg = [NSBitmapImageRep imageRepWithData:[image TIFFRepresentation]];
             
-            pvrtexture::CPVRTextureHeader header(pvrtexture::PVRStandard8PixelType.PixelTypeID, image.size.height , image.size.width);
-            pvrtexture::CPVRTexture pvrTexture(header , rawImg.bitmapData);
+            auto RGBA8888 = PVRTGENPIXELID4('r', 'g', 'b', 'a', 8, 8, 8, 8);
+            pvrtexlib::PVRTextureHeader header(RGBA8888, image.size.width, image.size.height);
+            pvrtexlib::PVRTexture pvrTexture(header , rawImg.bitmapData);
             
-            if(!pvrtexture::PreMultiplyAlpha(pvrTexture))
+            if(!pvrTexture.GetTextureIsPreMultiplied())
             {
                 if (error)
                 {
@@ -732,18 +732,18 @@ static void replacebytes(const char* path, long offset, const char * newBytes, l
             if(format == kFCImageFormatETC_ALPHA)
             {
                 data = [[NSMutableData alloc] initWithLength:dataLen * 2];
-                memcpy(data.mutableBytes, pvrTexture.getDataPtr(), dataLen);
-                pvrtexture::EChannelName szChannel[3] = { pvrtexture::eRed, pvrtexture::eGreen, pvrtexture::eBlue};
-                pvrtexture::EChannelName szChannelSource[3] = { pvrtexture::eAlpha, pvrtexture::eAlpha, pvrtexture::eAlpha};
-                pvrtexture::CopyChannels(pvrTexture, pvrTexture, 3, szChannel, szChannelSource);
-                memcpy((unsigned char*)data.mutableBytes + dataLen, pvrTexture.getDataPtr(), dataLen);
+                memcpy(data.mutableBytes, pvrTexture.GetTextureDataPointer(), dataLen);
+                PVRTexLibChannelName szChannel[3] = { PVRTLCN_Red, PVRTLCN_Green, PVRTLCN_Blue};
+                PVRTexLibChannelName szChannelSource[3] = { PVRTLCN_Red, PVRTLCN_Green, PVRTLCN_Blue};
+                pvrTexture.CopyChannels(pvrTexture, 3, szChannel, szChannelSource);
+                memcpy((unsigned char*)data.mutableBytes + dataLen, pvrTexture.GetTextureDataPointer(), dataLen);
                 qualcommTextureInput.nHeight *= 2;
                 //saveRawDataToPng(data.mutableBytes, image.size.width, image.size.height * 2, NO, [srcPath stringByAppendingPathExtension:@"png"], nil);
             }
             else
             {
                 data = [[NSMutableData alloc] initWithLength:dataLen];
-                memcpy(data.mutableBytes, pvrTexture.getDataPtr(), dataLen);
+                memcpy(data.mutableBytes, pvrTexture.GetTextureDataPointer(), dataLen);
             }
 
             qualcommTextureInput.pData                      = (unsigned char*)data.mutableBytes;

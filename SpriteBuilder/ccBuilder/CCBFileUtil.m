@@ -179,7 +179,7 @@
 							 ];
 	
 	// removing extranous cocos2d-iphone files if existing
-	const NSString* const cocosPath = @"Source/libs/cocos2d-iphone";
+    NSString* cocosPath = @"Source/libs/cocos2d-iphone";
 	NSFileManager* fm = [NSFileManager defaultManager];
 	NSString* parentPath = [path stringByDeletingLastPathComponent];
 	NSError* error;
@@ -189,8 +189,8 @@
 	{
 		for (NSString* removeItem in removeItems)
 		{
-			NSString* removePath = [NSString pathWithComponents:@[parentPath, cocosPath, removeItem]];
-			
+            NSString* removePath = [NSString pathWithComponents:@[parentPath, cocosPath, removeItem]];
+
 			if ([fm fileExistsAtPath:removePath])
 			{
 				[fm removeItemAtPath:removePath error:&error];

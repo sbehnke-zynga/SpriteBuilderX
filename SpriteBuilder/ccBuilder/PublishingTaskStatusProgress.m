@@ -25,14 +25,14 @@
 - (void)updateStatusText:(NSString *)text
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_taskStatus updateStatusText:text];
+        [self->_taskStatus updateStatusText:text];
     });
 }
 
 - (void)updateProgress
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_taskStatus setProgress:[self currentProgress]];
+        [self->_taskStatus setProgress:[self currentProgress]];
     });
 }
 

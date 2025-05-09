@@ -67,8 +67,8 @@
                                                 layerWidth:newFileWindowController.width
                                                layerHeight:newFileWindowController.height];
 
-                        id parentResource = [_resourceManager resourceForPath:dirPath];
-                        [_outlineView expandItem:parentResource];
+                id parentResource = [self->_resourceManager resourceForPath:dirPath];
+                [self->_outlineView expandItem:parentResource];
                     });
         }
     }

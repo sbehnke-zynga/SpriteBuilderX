@@ -10,8 +10,9 @@
 #import "BFColorPickerPopover.h"
 #import "BFColorPickerViewController.h"
 
-//static inline float pow2(float x) {return x*x;}
-//static inline NSString * NSStringFromNSEdgeInsets(NSEdgeInsets i) {return [NSString stringWithFormat:@"top: %f, left: %f, bottom: %f, right: %f", i.top, i.left, i.bottom, i.right];}
+#include <tgmath.h>
+
+static inline CGFloat pow2(CGFloat x) {return x*x;}
 
 @interface BFColorPickerViewController ()
 @property (nonatomic, weak) NSView *colorPanelView;
@@ -31,7 +32,6 @@
 
 @implementation BFColorPickerPopoverView
 
-/*
 - (void)mouseDown:(NSEvent *)event {
 	self.originalWindowOrigin = self.window.frame.origin;
 	self.originalMouseOffset = [event locationInWindow];
@@ -93,5 +93,5 @@
 	}
 
 }
-*/
+
 @end

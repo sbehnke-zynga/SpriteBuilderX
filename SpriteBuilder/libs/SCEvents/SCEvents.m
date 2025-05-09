@@ -215,7 +215,11 @@ static CFStringRef _strip_trailing_slash(CFStringRef string);
 	
     FSEventStreamInvalidate(_eventStream);
 	
-	if (_eventStream) FSEventStreamRelease(_eventStream), _eventStream = NULL;
+	if (_eventStream)
+    {
+        FSEventStreamRelease(_eventStream);
+        _eventStream = NULL;
+    }
     
     _isWatchingPaths = NO;
     
@@ -265,9 +269,12 @@ static CFStringRef _strip_trailing_slash(CFStringRef string);
         
 	pthread_mutex_destroy(&_eventsLock);
 	
-	[_lastEvent release], _lastEvent = nil;
-    [_watchedPaths release], _watchedPaths = nil;
-    [_excludedPaths release], _excludedPaths = nil;
+    [_lastEvent release];
+    _lastEvent = nil;
+    [_watchedPaths release];
+    _watchedPaths = nil;
+    [_excludedPaths release];
+    _excludedPaths = nil;
     
     [super dealloc];
 }

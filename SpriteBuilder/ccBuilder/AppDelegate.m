@@ -129,8 +129,6 @@
 #import "PreviewContainerViewController.h"
 #import "InspectorController.h"
 #import "EditClassWindow.h"
-#import <Fabric/Fabric.h>
-#import <Crashlytics/Crashlytics.h>
 #import "SettingsWindow.h"
 #import "SettingsManager.h"
 #import "PlatformSettings.h"
@@ -207,7 +205,7 @@ static AppDelegate* sharedAppDelegate = nil;
 
 //This function replaces the current CCNode visit with "customVisit" to ensure that 'hidden' flagged nodes are invisible.
 //However it then proceeds to call the real '[CCNode visit]' (now renamed oldVisit).
-void ApplyCustomNodeVisitSwizzle()
+void ApplyCustomNodeVisitSwizzle(void)
 {
 	
     Method origMethod = class_getInstanceMethod([CCNode class], @selector(visit:parentTransform:));
@@ -507,8 +505,6 @@ typedef enum
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    [Fabric with:@[[Crashlytics class]]];
-
     [SBUserDefaults setObject:@YES forKey:@"ApplePersistenceIgnoreState"];
     [SBUserDefaults registerDefaults:@{ @"NSApplicationCrashOnExceptions": @YES }];
     
@@ -807,6 +803,18 @@ typedef enum
     [modalTaskStatusWindow.window makeKeyAndOrderFront:self];
 
     [[NSApplication sharedApplication] runModalForWindow:modalTaskStatusWindow.window];
+}
+
+void runOnMainQueueWithoutDeadlocking(void (^block)(void))
+{
+    if ([NSThread isMainThread])
+    {
+        block();
+    }
+    else
+    {
+        dispatch_sync(dispatch_get_main_queue(), block);
+    }
 }
 
 - (void) modalStatusWindowFinish
@@ -1674,7 +1682,7 @@ typedef void (^SetNodeParamBlock)(CCNode*, id);
         paramsFunctions[@"expanded"] = ^void(CCNode* node, id value) {
             if([value boolValue])
             {
-                [sequenceHandler.outlineHierarchy expandItem:node];
+                [self->sequenceHandler.outlineHierarchy expandItem:node];
             }
         };
         
@@ -3319,7 +3327,7 @@ typedef void (^SetNodeParamBlock)(CCNode*, id);
                 [self saveFile:filename];
                 
                 // Close document
-                [tabView removeTabViewItem:[self tabViewItemFromDoc:currentDocument]];
+                [self->tabView removeTabViewItem:[self tabViewItemFromDoc:self->currentDocument]];
                 
                 // Open newly created document
                 [self openFile:filename];
@@ -3443,7 +3451,7 @@ typedef void (^SetNodeParamBlock)(CCNode*, id);
         [_publisherController startAsync:YES];
         [self modalStatusWindowStartWithTitle:@"Publishing" isIndeterminate:NO onCancelBlock:^
         {
-            [_publisherController cancel];
+            [self->_publisherController cancel];
         }];
         [self modalStatusWindowUpdateStatusText:@"Starting up..."];
     }
@@ -3606,7 +3614,7 @@ typedef void (^SetNodeParamBlock)(CCNode*, id);
                     if ([fileName hasSuffix:PACKAGE_NAME_SUFFIX])
                     {
                         PackageImporter *packageImporter = [[PackageImporter alloc] init];
-                        packageImporter.projectSettings = projectSettings;
+                        packageImporter.projectSettings = self->projectSettings;
                         [packageImporter importPackagesWithPaths:@[fileName] error:NULL];
                     }
                     else
